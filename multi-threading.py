@@ -7,14 +7,16 @@ from common import file_utils
 def task_sleep(sleep_duration, task_number, lock):
     lock.acquire()
     # Perform operation that require a common data/resource
+    print('Task number: {} acdquiring shared resource ..'.format(task_number))
     print(file_utils.read_content('test-file.txt'))
     lock.release()
 
-    time.sleep(sleep_duration)
-    print(f"Task {task_number} done (slept for {sleep_duration}s)! "
+    print(f"Task {task_number} (to sleep for {sleep_duration}s)! "
           f"Main thread: {threading.main_thread().name}, "
           f"Current thread: {threading.current_thread().name}, "
           f"Process ID: {os.getpid()}")
+    time.sleep(sleep_duration)
+    print(f"Task {task_number} done (slept for {sleep_duration}s)! ")
 
 
 def main():
