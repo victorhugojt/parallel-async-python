@@ -9,6 +9,11 @@ virtualenv venv-multi-task
 .\venv-multi-task\Scripts\activate
 ```
 
+```sh
+source venv-multi-task/bin/activate
+```
+
+
 ```python
 if io_bound:
     if io_very_slow:
