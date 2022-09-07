@@ -10,6 +10,10 @@ def process(chunk):
 def read(file_path, chunks_to_process):
     for chunk in file_utils.get_chunk(file_path, 10, ','):
         chunks_to_process.put(chunk)
+        print('processing chunk ... ')
+    
+    print('Read process finished !')
+    return True
 
 
 def work(chunks_to_process, chunks_processed):
@@ -31,7 +35,6 @@ def launch_workers(number, file_path):
     chunks_processed = Queue()
     reader = Process(target=read, args=(file_path, chunks_to_process))
     reader.start()
-    reader.join()
 
     process_workers = []
     for count in range(number - 1):
@@ -42,13 +45,15 @@ def launch_workers(number, file_path):
     for worker in process_workers:
         worker.join()
 
+    reader.join()
+
     while not chunks_processed.empty():
         print(chunks_processed.get())
 
 
 def main():
     print('Starting : 4 Workers ...')
-    launch_workers(4, 'small_csv_file.csv')
+    launch_workers(2, 'small_file.csv')
 
 
 if __name__ == '__main__':
