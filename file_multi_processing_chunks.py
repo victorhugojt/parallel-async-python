@@ -12,8 +12,8 @@ def read(file_path, chunks_to_process):
     print('Reader processor number : ' + current_process().name)
     for chunk in file_utils.get_chunk(file_path, 10, ','):
         chunks_to_process.put(chunk)
-        print('processing chunk ... ')
     
+
     print('Read process finished !')
     return True
 
@@ -23,11 +23,10 @@ def work(chunks_to_process, chunks_processed):
         try:           
             chunk = chunks_to_process.get_nowait()
             result = process(chunk)
-            print('Result: ', result[0][0])
-            print('chunk was done by : ' + current_process().name)
-            chunks_processed.put(result)
+            chunks_processed.put(result[0][0])
+            print(' {} - chunk was done by : {} '.format(result[0][0], current_process().name))
         except queue.Empty:
-            print('Empty ')
+            print(current_process().name + ' Without DATA ')
             break
 
     return True
@@ -39,10 +38,9 @@ def launch_workers(number, file_path):
     reader = Process(target=read, args=(file_path, chunks_to_process))
     reader.start()
 
-    time.sleep(3)
+    time.sleep(3) # wait for some data
     process_workers = []
-    for count in range(number - 1):
-        print('Starting worker : ', count)
+    for count in range(number - 1):        
         worker = Process(target=work, args=(chunks_to_process, chunks_processed))
         process_workers.append(worker)
         worker.start()
@@ -52,16 +50,15 @@ def launch_workers(number, file_path):
 
     reader.join()
 
-    print('All finished !')
-    print(chunks_processed)
+    print('Processed {} chunks '.format(str(chunks_processed.qsize())))
+    print('Main thread finished ')
 
-    while not chunks_processed.empty():
-        print(chunks_processed.get())
+    return True
 
 
 def main():
-    print('Starting : 4 Workers ...')
-    launch_workers(2, 'small_file.csv')
+    print('Starting : 3 Workers ...')
+    launch_workers(3, 'small_file.csv')
 
 
 if __name__ == '__main__':
